@@ -118,6 +118,8 @@ class TraffixActivity : ForegroundActivity(), MainActivity {
                 source: CRect,
                 timeout: Long
             ): Single<String> {
+                // TODO: This is not implemented in the original code either
+                // For now, keep the RxJava Single return type for compatibility with the interface
                 TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
 
@@ -202,8 +204,9 @@ class TraffixActivity : ForegroundActivity(), MainActivity {
 
     override fun onStart() {
         super.onStart()
+        // Keep RxJava for ApplicationBusy since it's from external library
         disposables.add(ApplicationBusy.listener.subscribe { setBusy(it) })
-        DisplayController.onStart()
+        DisplayController.onStart(this)
     }
 
     override fun onStop() {

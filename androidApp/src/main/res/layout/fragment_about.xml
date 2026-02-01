@@ -24,6 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textSize="18sp"
+            android:textColor="?android:attr/textColorPrimary"
             tools:text="Version x.x build yy" />
 
     </LinearLayout>

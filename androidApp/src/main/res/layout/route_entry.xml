@@ -28,6 +28,7 @@
                 android:layout_width="0dp"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:textColor="?android:attr/textColorPrimary"
                 tools:text="ABCDE"
                 android:layout_height="wrap_content" />
 
@@ -36,6 +37,7 @@
                 android:gravity="right"
                 android:layout_weight="1"
                 android:layout_width="0dp"
+                android:textColor="?android:attr/textColorPrimary"
                 tools:text="150km"
                 android:layout_height="wrap_content" />
         </LinearLayout>
@@ -45,6 +47,7 @@
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
             android:layout_width="match_parent"
+            android:textColor="?android:attr/textColorSecondary"
             tools:text="Alpha Bravo Charlie"
             android:layout_height="wrap_content" />
     </LinearLayout>

@@ -27,6 +27,8 @@ import android.os.Build
 import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import com.controlj.location.LocationSource
 import com.controlj.logging.CJLog.debug
 import com.controlj.logging.CJLog.logException
@@ -41,15 +43,14 @@ import com.controlj.traffic.TrafficSource
 import com.controlj.traffic.activity.TraffixActivity
 import com.controlj.traffic.data.AppSettings
 import com.google.gson.Gson
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.*
 import java.io.IOException
 import java.net.NetworkInterface
-import java.util.concurrent.TimeUnit
 
 @ExperimentalUnsignedTypes
-class TraffixService : Service() {
+class TraffixService : LifecycleService() {
 
     companion object {
         const val CHANNEL_ID = "TraffiX.notification"
@@ -178,28 +179,22 @@ class TraffixService : Service() {
         return START_STICKY
     }
 
-    private var disposables = CompositeDisposable()
+    private var pingJob: Job? = null
+    private var flarmDisposable: Disposable? = null
 
     /**
      * Periodically send out pings to notify GDL90 sources that we want their data
+     * Executes immediately on first iteration, then after each 10-second delay
      */
 
     private var lastPinged = ""
 
     private fun pingSources() {
         val json = Gson()
-        val broadcaster = UdpBroadcaster(address = "255.255.255.255")
-        disposables.add(
-            Observable.interval(0, 10, TimeUnit.SECONDS)
-                .observeOn(Schedulers.io())
-                .observeBy(
-                    {   // error
-                        broadcaster.close()
-                    },
-                    {   // termination
-                        broadcaster.close()
-                    },
-                ) {
+        pingJob = lifecycleScope.launch(Dispatchers.IO) {
+            val pingBroadcaster = UdpBroadcaster(address = "255.255.255.255")
+            try {
+                while (isActive) {
                     val data = json.toJson(
                         mapOf(
                             "App" to "TraffiX",
@@ -217,23 +212,31 @@ class TraffixService : Service() {
                             lastPinged = works.toString()
                             works.forEach { address ->
                                 pingPorts.forEach { port ->
-                                    broadcaster.broadcast(data, address, port)
+                                    pingBroadcaster.broadcast(data, address, port)
                                 }
                             }
                         }
                     } catch (ex: IOException) {
                         logException(ex)
                     }
+                    delay(10000) // 10 seconds
                 }
-        )
+            } catch (e: Exception) {
+                logException(e)
+            } finally {
+                pingBroadcaster.close()
+            }
+        }
     }
 
     private fun startup() {
-        disposables.clear()
+        pingJob?.cancel()
+        flarmDisposable?.dispose()
         LocationSource.add(Stratux)
         TrafficSource.add(StratuxTraffic)
         pingSources()
-        disposables.add(FlarmGenerator.observer
+        // Keep RxJava for FlarmGenerator since it's from external applibs library
+        flarmDisposable = FlarmGenerator.observer
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .observeBy(
@@ -246,18 +249,17 @@ class TraffixService : Service() {
                 }
             ) {
                 if (it.isNotBlank()) {
-                    //logMsg(it)
                     broadcaster.broadcast(
                         it.toByteArray(),
                         p = AppSettings.flarmPortSetting.value
                     )
                 }
             }
-        )
     }
 
     private fun shutdown() {
-        disposables.clear()
+        pingJob?.cancel()
+        flarmDisposable?.dispose()
         LocationSource.remove(Stratux)
         TrafficSource.remove(StratuxTraffic)
     }
