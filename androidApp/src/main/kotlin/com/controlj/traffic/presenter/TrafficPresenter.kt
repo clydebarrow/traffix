@@ -68,9 +68,7 @@ class TrafficPresenter : ListPresenter<TrafficPresenter.Target>() {
     override val keySelector: (Target) -> String = { it.address.toString() }
 
     init {
-        // Convert to using a suspend function instead of Observable.defer
-        // Since this is called from the base class which expects an Observable,
-        // we still need to keep the Observable wrapper here
+        // Using Observable.defer for compatibility with ListPresenter base class
         addSection(
             "Traffic",
             io.reactivex.rxjava3.core.Observable.defer {

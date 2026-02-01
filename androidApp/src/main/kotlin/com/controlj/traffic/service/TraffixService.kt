@@ -184,16 +184,17 @@ class TraffixService : LifecycleService() {
 
     /**
      * Periodically send out pings to notify GDL90 sources that we want their data
+     * Executes immediately on first iteration, then after each 10-second delay
      */
 
     private var lastPinged = ""
 
     private fun pingSources() {
         val json = Gson()
-        val broadcaster = UdpBroadcaster(address = "255.255.255.255")
         pingJob = lifecycleScope.launch(Dispatchers.IO) {
-            while (isActive) {
-                try {
+            val pingBroadcaster = UdpBroadcaster(address = "255.255.255.255")
+            try {
+                while (isActive) {
                     val data = json.toJson(
                         mapOf(
                             "App" to "TraffiX",
@@ -211,18 +212,19 @@ class TraffixService : LifecycleService() {
                             lastPinged = works.toString()
                             works.forEach { address ->
                                 pingPorts.forEach { port ->
-                                    broadcaster.broadcast(data, address, port)
+                                    pingBroadcaster.broadcast(data, address, port)
                                 }
                             }
                         }
                     } catch (ex: IOException) {
                         logException(ex)
                     }
-                } catch (e: Exception) {
-                    broadcaster.close()
-                    logException(e)
+                    delay(10000) // 10 seconds
                 }
-                delay(10000) // 10 seconds
+            } catch (e: Exception) {
+                logException(e)
+            } finally {
+                pingBroadcaster.close()
             }
         }
     }

@@ -31,7 +31,6 @@ object DisplayController {
 
     private val disposables = mutableListOf<Disposable>()
     private val jobs = mutableListOf<Job>()
-    private var lifecycleOwner: LifecycleOwner? = null
 
     /**
      * Invalidate displayed data
@@ -46,7 +45,6 @@ object DisplayController {
     }
 
     fun onStart(owner: LifecycleOwner) {
-        lifecycleOwner = owner
         jobs.forEach { it.cancel() }
         jobs.clear()
         disposables.forEach { it.dispose() }
@@ -60,6 +58,7 @@ object DisplayController {
         messageView.requestRedraw()
         
         // Replace Observable.interval with coroutine timer
+        // Executes immediately on first iteration, then after each 1-second delay
         jobs.add(owner.lifecycleScope.launch(Dispatchers.Main) {
             while (isActive) {
                 routeGroup.invalidateUtc()
@@ -80,10 +79,5 @@ object DisplayController {
                 }
             }
         )
-    }
-    
-    // Overload for backward compatibility
-    fun onStart() {
-        logMsg("DisplayController.onStart() called without LifecycleOwner - some features may not work properly")
     }
 }
