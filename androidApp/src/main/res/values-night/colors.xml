@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2021.  Control-J Pty Ltd
+  ~ All rights reserved
+  -->
+
+<resources>
+    <!-- Dark mode color overrides -->
+    <color name="primary">#00BCD4</color>
+    <color name="primary_dark">#0097A7</color>
+    <color name="primary_light">#1A3A3F</color>
+    <color name="accent">#FF9800</color>
+    <color name="primary_text">#E0E0E0</color>
+    <color name="secondary_text">#AAAAAA</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#4A4A4A</color>
+    <color name="black_overlay">#66000000</color>
+    <color name="header_background">#1E1E2E</color>
+
+    <color name="outOfRange">#00000000</color>
+    <color name="normal">#00FF00</color>
+    <color name="caution">#EFEF20</color>
+    <color name="alarm">#FF7878</color>
+    <color name="fuel_normal">#E0E0E0</color>
+    <color name="button_text">#FFFFFF</color>
+    <color name="uploaded">#60B060</color>
+
+</resources>

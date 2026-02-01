@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2021.  Control-J Pty Ltd
+  ~ All rights reserved
+  -->
+
+<resources>
+    <!-- Dark mode overrides for material colors used in layouts -->
+    <color name="md_green_50">#1B3E20</color>
+    <color name="md_yellow_50">#3E3820</color>
+</resources>

@@ -28,7 +28,7 @@ val Rxjava3Android = Rxjava3.variant("rxandroid", "3.0.0")
 val Rxjava3Kotlin = Rxjava3.variant("rxkotlin", "3.0.0")
 
 val Gson = Dependency("com.google.code.gson", "gson", "2.8.5")
-val Material = Dependency("com.google.android.material", "material", "1.1.0")
+val Material = Dependency("com.google.android.material", "material", "1.12.0")
 
 val AndroidMapboxSdk = Dependency("com.mapbox.mapboxsdk", "mapbox-android-sdk", "9.7.2")
 val AndroidMapboxBuildings =
@@ -46,22 +46,22 @@ val CJLog = Dependency("com.control-j.cjlog", "core", "2.4")
 
 object AndroidApp {
     const val minSdkVersion = 21
-    const val targetSdkVersion = 33
+    const val targetSdkVersion = 35
 }
 
-val MaterialDrawer = Dependency("com.mikepenz", "materialdrawer", "8.1.3")
+val MaterialDrawer = Dependency("com.mikepenz", "materialdrawer", "8.4.5")
 
-val AndroidBuildTools = Dependency("com.android.tools.build", "gradle", "7.3.1")
+val AndroidBuildTools = Dependency("com.android.tools.build", "gradle", "8.5.2")
 val GoogleServices = Dependency("com.google.gms", "google-services", "4.3.2")
 
 val AndroidXLegacy = Dependency("androidx.legacy", "legacy-support-v4", "1.0.0")
-val AndroidXAnnotation = Dependency("androidx.annotation", "annotation", "1.1.0")
+val AndroidXAnnotation = Dependency("androidx.annotation", "annotation", "1.9.1")
 val AndroidXMultidex = Dependency("androidx.multidex", "multidex", "2.0.1")
-val AndroidXAppcompat = Dependency("androidx.appcompat", "appcompat", "1.4.0")
-val AndroidSplashScreen = Dependency("androidx.core", "core-splashscreen", "1.0.0")
-val AndroidXWork = Dependency("androidx.work", "work-runtime", "2.3.4")
-val RecyclerView = Dependency("androidx.recyclerview", "recyclerview", "1.1.0")
-val ConstraintLayout = Dependency("androidx.constraintlayout", "constraintlayout", "2.1.2")
+val AndroidXAppcompat = Dependency("androidx.appcompat", "appcompat", "1.7.0")
+val AndroidSplashScreen = Dependency("androidx.core", "core-splashscreen", "1.0.1")
+val AndroidXWork = Dependency("androidx.work", "work-runtime", "2.10.0")
+val RecyclerView = Dependency("androidx.recyclerview", "recyclerview", "1.3.2")
+val ConstraintLayout = Dependency("androidx.constraintlayout", "constraintlayout", "2.2.0")
 
 val Ktorm = Dependency("org.ktorm", "ktorm-core", "3.5.0")
 val KtormSqlite = Ktorm.variant("ktorm-support-sqlite")
