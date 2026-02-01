@@ -24,5 +24,6 @@
     <color name="button_text">#FFFFFF</color>
     <color name="uploaded">#80FF80</color>
 
+    <color name="divider_color">#E0E0E0</color>
 
 </resources>
