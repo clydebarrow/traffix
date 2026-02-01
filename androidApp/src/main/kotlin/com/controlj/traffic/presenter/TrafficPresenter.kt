@@ -10,7 +10,6 @@ import com.controlj.settings.AviationUnitSettings
 import com.controlj.traffic.TrafficSource
 import com.controlj.traffic.TrafficTarget
 import com.controlj.view.ListPresenter
-import io.reactivex.rxjava3.core.Observable
 
 class TrafficPresenter : ListPresenter<TrafficPresenter.Target>() {
 
@@ -69,16 +68,23 @@ class TrafficPresenter : ListPresenter<TrafficPresenter.Target>() {
     override val keySelector: (Target) -> String = { it.address.toString() }
 
     init {
+        // Convert to using a suspend function instead of Observable.defer
+        // Since this is called from the base class which expects an Observable,
+        // we still need to keep the Observable wrapper here
         addSection(
             "Traffic",
-            Observable.defer {
-                Observable.fromIterable((TrafficSource.allTargets.map { Target(it) })
-                    .sortedByDescending { it.distance })
-            })
+            io.reactivex.rxjava3.core.Observable.defer {
+                io.reactivex.rxjava3.core.Observable.fromIterable(
+                    (TrafficSource.allTargets.map { Target(it) })
+                        .sortedByDescending { it.distance }
+                )
+            }
+        )
     }
 
     override fun onStart() {
         super.onStart()
+        // Keep RxJava for TrafficSource.observer since it's from external library
         disposables.add(
             TrafficSource.observer.observeOnMainBy { list ->
                 refresh()

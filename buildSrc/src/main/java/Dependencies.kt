@@ -21,7 +21,10 @@ val ThreetenBp = Dependency("org.threeten", "threetenbp", "1.4.4")
 
 val AndroidSupport = Dependency("com.android.support", "support-v4", "28.0.0")
 
-val TbruyelleRxpermissions2 = Dependency("com.github.tbruyelle", "rxpermissions", "0.12")
+// Kotlin Coroutines
+val CoroutinesCore = Dependency("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.7.3")
+val CoroutinesAndroid = Dependency("org.jetbrains.kotlinx", "kotlinx-coroutines-android", "1.7.3")
+val LifecycleRuntimeKtx = Dependency("androidx.lifecycle", "lifecycle-runtime-ktx", "2.8.7")
 
 val Rxjava3 = Dependency("io.reactivex.rxjava3", "rxjava", "3.0.4")
 val Rxjava3Android = Rxjava3.variant("rxandroid", "3.0.0")

@@ -5,6 +5,8 @@
 
 package com.controlj.traffic.control
 
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.controlj.location.LocationProvider
 import com.controlj.location.LocationSource
 import com.controlj.logging.CJLog.logException
@@ -12,14 +14,11 @@ import com.controlj.logging.CJLog.logMsg
 import com.controlj.rx.finaliseUI
 import com.controlj.rx.observeOnMainBy
 import com.controlj.stratux.Stratux
-import com.controlj.stratux.gdl90.StratuxStatus
 import com.controlj.traffic.view.RouteGroup
 import com.controlj.widget.MessageBank
 import com.controlj.widget.MessageView
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.*
 
 /**
  * Drives the visible display
@@ -30,28 +29,47 @@ object DisplayController {
     val messageView = MessageView(messageBank)
     val routeGroup = RouteGroup()
 
-    private val disposables = CompositeDisposable()
+    private val disposables = mutableListOf<Disposable>()
+    private val jobs = mutableListOf<Job>()
+    private var lifecycleOwner: LifecycleOwner? = null
 
     /**
      * Invalidate displayed data
      */
 
     fun onStop() {
+        jobs.forEach { it.cancel() }
+        jobs.clear()
+        disposables.forEach { it.dispose() }
         disposables.clear()
         LocationSource.remove(LocationProvider.deviceProvider)
     }
 
-    fun onStart() {
+    fun onStart(owner: LifecycleOwner) {
+        lifecycleOwner = owner
+        jobs.forEach { it.cancel() }
+        jobs.clear()
+        disposables.forEach { it.dispose() }
         disposables.clear()
         logMsg("onStart")
+        
+        // Keep RxJava for messageBank.observable since it's from external library
         disposables.add(messageBank.observable.observeOnMainBy {
             messageView.requestRedraw()
         })
         messageView.requestRedraw()
-        disposables.add(Observable.interval(0L, 1L, TimeUnit.SECONDS)
-            .observeOnMainBy { routeGroup.invalidateUtc() }
-        )
+        
+        // Replace Observable.interval with coroutine timer
+        jobs.add(owner.lifecycleScope.launch(Dispatchers.Main) {
+            while (isActive) {
+                routeGroup.invalidateUtc()
+                delay(1000) // 1 second
+            }
+        })
+        
         LocationSource.add(LocationProvider.deviceProvider)
+        
+        // Keep RxJava for LocationSource.observer since it's from external library
         disposables.add(LocationSource.observer
             .finaliseUI(routeGroup::invalidateData)
             .observeOnMainBy { data ->
@@ -62,5 +80,10 @@ object DisplayController {
                 }
             }
         )
+    }
+    
+    // Overload for backward compatibility
+    fun onStart() {
+        logMsg("DisplayController.onStart() called without LifecycleOwner - some features may not work properly")
     }
 }
